@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { updateMentorProfileAction } from "./actions";
+import { updateMentorProfileAction, deleteMentorAccountAction } from "./actions";
 import { Loader2, User, Mail, IdCard, BookOpen, GraduationCap } from "lucide-react";
+import { useLanguage } from "@/components/providers/language-provider";
+import { DeleteProfileDialog } from "@/components/ui/delete-profile-dialog";
 
 interface ProfileClientProps {
   mentor: {
@@ -24,7 +26,9 @@ interface ProfileClientProps {
 export default function ProfileClient({ mentor }: ProfileClientProps) {
   const router = useRouter();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [formData, setFormData] = useState({
     full_name: mentor.full_name || "",
     student_id: mentor.student_id || "",
@@ -44,13 +48,13 @@ export default function ProfileClient({ mentor }: ProfileClientProps) {
       }
       
       toast({
-        title: "Success!",
-        description: "Profile updated successfully",
+        title: t("success"),
+        description: t("profileUpdated") || "Profile updated successfully",
       });
       router.refresh();
     } catch (error) {
       toast({
-        title: "Error",
+        title: t("error"),
         description: error instanceof Error ? error.message : "Failed to update profile",
         variant: "destructive",
       });
@@ -59,26 +63,49 @@ export default function ProfileClient({ mentor }: ProfileClientProps) {
     }
   };
 
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const result = await deleteMentorAccountAction();
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      toast({
+        title: t("success"),
+        description: t("accountDeleted") || "Account deleted successfully",
+      });
+      router.push("/");
+    } catch (error) {
+      toast({
+        title: t("error"),
+        description: error instanceof Error ? error.message : "Failed to delete account",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="p-6 lg:p-8 max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Profile & Settings</h1>
-        <p className="text-muted-foreground mt-2">Manage your account information</p>
+        <h1 className="text-3xl font-bold">{t("profileSettings")}</h1>
+        <p className="text-muted-foreground mt-2">{t("updateProfileDesc")}</p>
       </div>
 
       <div className="grid gap-6">
         {/* Profile Information Card */}
         <Card>
           <CardHeader>
-            <CardTitle>Profile Information</CardTitle>
-            <CardDescription>Update your personal details</CardDescription>
+            <CardTitle>{t("profileInfo")}</CardTitle>
+            <CardDescription>{t("updateProfileDesc")}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="full_name">
                   <User className="inline h-4 w-4 mr-2" />
-                  Full Name *
+                  {t("fullName")} *
                 </Label>
                 <Input
                   id="full_name"
@@ -92,7 +119,7 @@ export default function ProfileClient({ mentor }: ProfileClientProps) {
               <div className="space-y-2">
                 <Label htmlFor="email">
                   <Mail className="inline h-4 w-4 mr-2" />
-                  Email (Cannot be changed)
+                  {t("email")} (Cannot be changed)
                 </Label>
                 <Input
                   id="email"
@@ -106,7 +133,7 @@ export default function ProfileClient({ mentor }: ProfileClientProps) {
                 <div className="space-y-2">
                   <Label htmlFor="student_id">
                     <IdCard className="inline h-4 w-4 mr-2" />
-                    Student ID
+                    {t("studentId")}
                   </Label>
                   <Input
                     id="student_id"
@@ -120,7 +147,7 @@ export default function ProfileClient({ mentor }: ProfileClientProps) {
                 <div className="space-y-2">
                   <Label htmlFor="batch">
                     <GraduationCap className="inline h-4 w-4 mr-2" />
-                    Batch
+                    {t("batch")}
                   </Label>
                   <Input
                     id="batch"
@@ -135,7 +162,7 @@ export default function ProfileClient({ mentor }: ProfileClientProps) {
               <div className="space-y-2">
                 <Label htmlFor="department">
                   <BookOpen className="inline h-4 w-4 mr-2" />
-                  Department
+                  {t("department")}
                 </Label>
                 <Input
                   id="department"
@@ -148,7 +175,7 @@ export default function ProfileClient({ mentor }: ProfileClientProps) {
               <div className="flex justify-end pt-4">
                 <Button type="submit" disabled={isLoading}>
                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save Changes
+                  {t("saveChanges")}
                 </Button>
               </div>
             </form>
@@ -158,22 +185,33 @@ export default function ProfileClient({ mentor }: ProfileClientProps) {
         {/* Account Information Card */}
         <Card>
           <CardHeader>
-            <CardTitle>Account Information</CardTitle>
-            <CardDescription>View your account details</CardDescription>
+            <CardTitle>{t("accountInfo")}</CardTitle>
+            <CardDescription>{t("viewAccountDesc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="flex justify-between items-center py-2 border-b">
-              <span className="text-sm font-medium">Account ID</span>
+              <span className="text-sm font-medium">{t("accountId")}</span>
               <span className="text-sm text-muted-foreground font-mono">{mentor.id.slice(0, 8)}...</span>
             </div>
             <div className="flex justify-between items-center py-2 border-b">
-              <span className="text-sm font-medium">Email Status</span>
-              <span className="text-sm text-green-600 font-medium">Verified</span>
+              <span className="text-sm font-medium">{t("emailStatus")}</span>
+              <span className="text-sm text-green-600 font-medium">{t("verified")}</span>
             </div>
             <div className="flex justify-between items-center py-2">
-              <span className="text-sm font-medium">Account Type</span>
-              <span className="text-sm text-muted-foreground">Mentor</span>
+              <span className="text-sm font-medium">{t("accountType")}</span>
+              <span className="text-sm text-muted-foreground">{t("mentor")}</span>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Delete Account Card */}
+        <Card className="border-destructive/50">
+          <CardHeader>
+            <CardTitle className="text-destructive">{t("deleteAccount")}</CardTitle>
+            <CardDescription>{t("deleteAccountDesc")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+             <DeleteProfileDialog isLoading={isDeleting} onConfirm={handleDelete} />
           </CardContent>
         </Card>
       </div>

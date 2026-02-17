@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import StudentSearch from "./components/student-search";
 import CollapsibleAttendance from "./components/collapsible-attendance";
 import BatchEdit from "./components/batch-edit";
+import { DownloadReportButton } from "./components/download-report-button";
 import Link from "next/link";
 import { ArrowLeft, Users, CalendarDays, Upload, Plus } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -31,6 +32,7 @@ export default async function BatchDetailPage({
   // Fetch attendance data for all sessions
   const supabase = await createClient();
   const attendanceBySession = new Map();
+  const attendanceData: Record<string, any[]> = {}; // For PDF generation and serialization
   
   for (const session of sessions) {
     const { data: attendanceRecords } = await supabase
@@ -46,7 +48,23 @@ export default async function BatchDetailPage({
       .order("created_at");
     
     attendanceBySession.set(session.id, attendanceRecords || []);
+    attendanceData[session.id] = attendanceRecords || [];
   }
+
+  // Calculate overall attendance percentage
+  let totalPresent = 0;
+  let totalRecords = 0;
+
+  for (const records of attendanceBySession.values()) {
+    if (records) {
+      totalRecords += records.length;
+      totalPresent += records.filter((r: any) => r.status === "Present").length;
+    }
+  }
+
+  const attendanceRate = totalRecords > 0
+    ? Math.round((totalPresent / totalRecords) * 100)
+    : 0;
 
   return (
     <div className="p-6 lg:p-8 space-y-6">
@@ -58,22 +76,30 @@ export default async function BatchDetailPage({
             Back to Batches
           </Link>
         </Button>
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold">{batch.batch_name}</h1>
             <p className="text-muted-foreground mt-2">
               {batch.department_name} • {batch.section} • {batch.semester}
             </p>
           </div>
-          <span
-            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-              batch.status === "Active"
-                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
-            }`}
-          >
-            {batch.status}
-          </span>
+          <div className="flex items-center gap-2">
+            <DownloadReportButton
+              batch={batch}
+              students={students}
+              sessions={sessions}
+              attendanceData={attendanceData}
+            />
+            <span
+              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                batch.status === "Active"
+                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                  : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
+              }`}
+            >
+              {batch.status}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -101,11 +127,11 @@ export default async function BatchDetailPage({
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Attendance</CardTitle>
+            <CardTitle className="text-sm font-medium">Attendance Rate</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0%</div>
+            <div className="text-2xl font-bold">{attendanceRate}%</div>
           </CardContent>
         </Card>
       </div>

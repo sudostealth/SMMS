@@ -11,13 +11,20 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-  const { data: mentor } = await supabase
+  // Fetch mentor profile using auth_user_id
+  const { data: mentor, error } = await supabase
     .from("mentors")
     .select("*")
-    .eq("id", user.id)
+    .eq("auth_user_id", user.id)
     .single();
 
-  if (!mentor) {
+  if (error || !mentor) {
+    // If mentor record is missing, they might need to complete their profile
+    // But for now, we'll redirect to login or show an error state.
+    // Given the task, let's assume valid users should have a profile.
+    console.error("Mentor profile not found for user:", user.id, error);
+    // Maybe redirect to a 'create-profile' page if that existed?
+    // For now, redirect to login as per existing behavior, but log the error.
     redirect("/login");
   }
 

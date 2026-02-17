@@ -1,84 +1,128 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { GraduationCap, Users, CalendarCheck, BarChart3 } from "lucide-react";
+import { LanguageToggle } from "@/components/ui/language-toggle";
+import { useLanguage } from "@/components/providers/language-provider";
+import Footer from "@/components/layout/footer";
+import { GraduationCap, Users, CalendarCheck, BarChart3, ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function HomePage() {
+  const { t } = useLanguage();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-slate-900 overflow-hidden relative">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-20"></div>
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-40 -left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
+      </div>
+
       {/* Header */}
-      <header className="border-b bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
+      <header className="sticky top-0 z-50 border-b bg-white/70 dark:bg-gray-900/70 backdrop-blur-md transition-all duration-300">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <GraduationCap className="h-8 w-8 text-primary" />
+          <div className="flex items-center space-x-2 group cursor-pointer">
+            <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+              <GraduationCap className="h-6 w-6 text-primary" />
+            </div>
             <div>
-              <h1 className="text-xl font-bold text-primary">GUSMP</h1>
-              <p className="text-xs text-muted-foreground">Mentor Management</p>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">GUSMP</h1>
+              <p className="text-xs text-muted-foreground">{t("mentorManagement")}</p>
             </div>
           </div>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <LanguageToggle />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <main className="container mx-auto px-4 py-20">
-        <div className="text-center space-y-8 max-w-4xl mx-auto">
-          <div className="inline-block px-4 py-2 bg-primary/10 rounded-full">
+      <main className="flex-1 container mx-auto px-4 py-12 flex flex-col items-center justify-center relative z-10">
+        <div className="text-center space-y-8 max-w-5xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-1000">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 dark:bg-primary/20 rounded-full border border-primary/20 hover:bg-primary/20 transition-colors cursor-default">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
             <p className="text-sm font-medium text-primary">
-              Green University of Bangladesh
+              {t("greenUniversity")}
             </p>
           </div>
           
-          <h2 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white">
-            Student Mentorship
-            <span className="block text-primary mt-2">Management System</span>
+          <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900 dark:text-white drop-shadow-sm">
+            {t("welcome")}
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-green-500 to-emerald-600 mt-2 pb-2">
+              {t("subtitle")}
+            </span>
           </h2>
           
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Empowering mentors to efficiently manage batches, track student attendance,
-            conduct sessions, and generate comprehensive reports.
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            {t("description")}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button asChild size="lg" className="text-lg px-8">
-              <Link href="/login">Login as Mentor</Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+            <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-105 transition-all duration-300 group">
+              <Link href="/login">
+                {t("login")}
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="text-lg px-8">
-              <Link href="/register">Register Now</Link>
+            <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6 rounded-full border-2 hover:bg-primary/5 hover:scale-105 transition-all duration-300">
+              <Link href="/register">{t("signup")}</Link>
             </Button>
           </div>
 
           {/* Features Grid */}
-          <div className="grid md:grid-cols-4 gap-6 pt-16">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-              <Users className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h3 className="font-semibold text-lg mb-2">Batch Management</h3>
-              <p className="text-sm text-muted-foreground">
-                Create and manage multiple batches efficiently
+          <div className="grid md:grid-cols-4 gap-6 pt-20 text-left">
+            <div className="group bg-white/60 dark:bg-gray-800/60 p-6 rounded-2xl shadow-xl hover:shadow-2xl border border-white/20 dark:border-gray-700/50 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1">
+              <div className="h-12 w-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <h3 className="font-bold text-lg mb-2 text-gray-900 dark:text-white">{t("batchManagement")}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("batchManagementDesc")}
               </p>
             </div>
             
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-              <CalendarCheck className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h3 className="font-semibold text-lg mb-2">Attendance Tracking</h3>
-              <p className="text-sm text-muted-foreground">
-                Mark and track student attendance easily
+            <div className="group bg-white/60 dark:bg-gray-800/60 p-6 rounded-2xl shadow-xl hover:shadow-2xl border border-white/20 dark:border-gray-700/50 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1">
+              <div className="h-12 w-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <CalendarCheck className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
+              <h3 className="font-bold text-lg mb-2 text-gray-900 dark:text-white">{t("attendanceSystem")}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("attendanceSystemDesc")}
               </p>
             </div>
             
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-              <BarChart3 className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h3 className="font-semibold text-lg mb-2">Analytics Dashboard</h3>
-              <p className="text-sm text-muted-foreground">
-                View comprehensive statistics and trends
+            <div className="group bg-white/60 dark:bg-gray-800/60 p-6 rounded-2xl shadow-xl hover:shadow-2xl border border-white/20 dark:border-gray-700/50 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1">
+              <div className="h-12 w-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <BarChart3 className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              </div>
+              <h3 className="font-bold text-lg mb-2 text-gray-900 dark:text-white">{t("studentTracking")}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("studentTrackingDesc")}
               </p>
             </div>
             
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-              <GraduationCap className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h3 className="font-semibold text-lg mb-2">PDF Reports</h3>
-              <p className="text-sm text-muted-foreground">
-                Generate detailed batch and student reports
+            <div className="group bg-white/60 dark:bg-gray-800/60 p-6 rounded-2xl shadow-xl hover:shadow-2xl border border-white/20 dark:border-gray-700/50 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1">
+              <div className="h-12 w-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                <GraduationCap className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              </div>
+              <h3 className="font-bold text-lg mb-2 text-gray-900 dark:text-white">{t("pdfReports")}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t("pdfReportsDesc")}
               </p>
             </div>
           </div>
@@ -86,32 +130,7 @@ export default function HomePage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t mt-20 py-8 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 text-center space-y-4">
-          <div className="text-sm text-muted-foreground">
-            <p>&copy; 2026 Green University of Bangladesh. All rights reserved.</p>
-            <p className="mt-1">Student Mentorship Program</p>
-          </div>
-          <div className="pt-4 border-t">
-            <p className="text-sm font-medium mb-2">Developed by</p>
-            <p className="text-sm font-semibold">Md. Imam Mahdi Dsazib</p>
-            <div className="flex items-center justify-center gap-4 mt-2 text-xs text-muted-foreground">
-              <a href="mailto:imammahdi.dsazib@gmail.com" className="hover:text-primary transition-colors">
-                imammahdi.dsazib@gmail.com
-              </a>
-              <span>•</span>
-              <a 
-                href="https://github.com/immdsazib" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="hover:text-primary transition-colors"
-              >
-                @immdsazib
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

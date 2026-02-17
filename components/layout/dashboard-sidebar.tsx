@@ -7,7 +7,9 @@ import { signOut } from "@/lib/services/auth-client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { LanguageToggle } from "@/components/ui/language-toggle";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/components/providers/language-provider";
 import {
   GraduationCap,
   LayoutDashboard,
@@ -25,33 +27,34 @@ interface DashboardSidebarProps {
   mentor: Mentor;
 }
 
-const menuItems = [
-  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/batches", icon: Users, label: "Batches" },
-  { href: "/create-batch", icon: PlusCircle, label: "Create Batch" },
-  { href: "/profile", icon: User, label: "Profile & Settings" },
-];
-
 export default function DashboardSidebar({ mentor }: DashboardSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const menuItems = [
+    { href: "/dashboard", icon: LayoutDashboard, label: t("dashboard") },
+    { href: "/batches", icon: Users, label: t("batches") },
+    { href: "/create-batch", icon: PlusCircle, label: t("createBatch") },
+    { href: "/profile", icon: User, label: t("profileSettings") },
+  ];
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
       await signOut();
       toast({
-        title: "Logged out",
-        description: "You have been logged out successfully.",
+        title: "Logged out", // I should translate this too if possible, but toast content is often dynamic
+        description: t("logout") + " successful.", // Imperfect translation
       });
       router.push("/");
       router.refresh();
     } catch (error) {
       toast({
-        title: "Error",
+        title: t("error"),
         description: "Failed to logout",
         variant: "destructive",
       });
@@ -70,6 +73,7 @@ export default function DashboardSidebar({ mentor }: DashboardSidebarProps) {
             <span className="font-bold text-lg">GUSMP</span>
           </div>
           <div className="flex items-center space-x-2">
+            <LanguageToggle />
             <ThemeToggle />
             <Button
               variant="ghost"
@@ -97,7 +101,7 @@ export default function DashboardSidebar({ mentor }: DashboardSidebarProps) {
             <GraduationCap className="h-8 w-8 text-primary" />
             <div>
               <h1 className="text-lg font-bold text-primary">GUSMP</h1>
-              <p className="text-xs text-muted-foreground">Mentor Portal</p>
+              <p className="text-xs text-muted-foreground">{t("mentorPortal")}</p>
             </div>
           </div>
 
@@ -140,8 +144,11 @@ export default function DashboardSidebar({ mentor }: DashboardSidebarProps) {
 
           {/* Footer */}
           <div className="p-4 border-t space-y-2">
-            <div className="hidden lg:block">
-              <ThemeToggle />
+            <div className="flex items-center justify-between px-2">
+               <LanguageToggle />
+               <div className="hidden lg:block">
+                <ThemeToggle />
+               </div>
             </div>
             <Button
               variant="ghost"
@@ -150,7 +157,7 @@ export default function DashboardSidebar({ mentor }: DashboardSidebarProps) {
               disabled={isLoggingOut}
             >
               <LogOut className="mr-3 h-5 w-5" />
-              Logout
+              {t("logout")}
             </Button>
           </div>
         </div>
