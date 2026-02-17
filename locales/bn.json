@@ -1,0 +1,103 @@
+{
+  "common": {
+    "gusmp": "GUSMP",
+    "fullName": "গ্রীন ইউনিভার্সিটি স্টুডেন্ট মেন্টরশিপ প্রোগ্রাম",
+    "universityName": "গ্রীন ইউনিভার্সিটি অব বাংলাদেশ",
+    "loading": "লোড হচ্ছে...",
+    "error": "ত্রুটি",
+    "success": "সফল",
+    "submit": "জমা দিন",
+    "cancel": "বাতিল",
+    "delete": "মুছে ফেলুন",
+    "edit": "সম্পাদনা",
+    "save": "সংরক্ষণ",
+    "add": "যোগ করুন",
+    "search": "খুঁজুন",
+    "filter": "ফিল্টার"
+  },
+  "nav": {
+    "dashboard": "ড্যাশবোর্ড",
+    "batches": "ব্যাচসমূহ",
+    "createBatch": "ব্যাচ তৈরি করুন",
+    "profile": "প্রোফাইল",
+    "settings": "সেটিংস",
+    "logout": "লগআউট"
+  },
+  "auth": {
+    "login": "লগইন",
+    "register": "রেজিস্টার",
+    "signUp": "সাইন আপ",
+    "signIn": "সাইন ইন",
+    "email": "ইমেইল",
+    "password": "পাসওয়ার্ড",
+    "fullName": "পুর্ণ নাম",
+    "universityId": "বিশ্ববিদ্যালয় আইডি",
+    "alreadyHaveAccount": "ইতিমধ্যে একটি অ্যাকাউন্ট আছে?",
+    "dontHaveAccount": "অ্যাকাউন্ট নেই?",
+    "welcomeBack": "আবার স্বাগতম!",
+    "createAccount": "আপনার অ্যাকাউন্ট তৈরি করুন"
+  },
+  "batch": {
+    "batchName": "ব্যাচের নাম",
+    "department": "বিভাগ",
+    "section": "সেকশন",
+    "semester": "সেমিস্টার",
+    "status": "অবস্থা",
+    "active": "সক্রিয়",
+    "graduated": "স্নাতক",
+    "createBatch": "ব্যাচ তৈরি করুন",
+    "totalStudents": "মোট শিক্ষার্থী",
+    "totalSessions": "মোট সেশন",
+    "attendancePercentage": "উপস্থিতি",
+    "markAsGraduated": "স্নাতক হিসেবে চিহ্নিত করুন",
+    "spring": "বসন্ত",
+    "summer": "গ্রীষ্ম",
+    "fall": "শরৎ"
+  },
+  "student": {
+    "student": "শিক্ষার্থী",
+    "students": "শিক্ষার্থীরা",
+    "addStudent": "শিক্ষার্থী যোগ করুন",
+    "name": "নাম",
+    "studentId": "শিক্ষার্থী আইডি",
+    "phone": "ফোন",
+    "email": "ইমেইল",
+    "bulkUpload": "বাল্ক আপলোড",
+    "uploadCsv": "CSV আপলোড",
+    "uploadExcel": "Excel আপলোড",
+    "deleteStudent": "শিক্ষার্থী মুছে ফেলুন"
+  },
+  "session": {
+    "session": "সেশন",
+    "sessions": "সেশনগুলি",
+    "createSession": "সেশন তৈরি করুন",
+    "sessionNumber": "সেশন নম্বর",
+    "sessionDate": "সেশনের তারিখ",
+    "method": "পদ্ধতি",
+    "online": "অনলাইন",
+    "offline": "অফলাইন",
+    "platform": "প্ল্যাটফর্ম",
+    "roomNumber": "রুম নম্বর"
+  },
+  "attendance": {
+    "attendance": "উপস্থিতি",
+    "markAttendance": "উপস্থিতি চিহ্নিত করুন",
+    "present": "উপস্থিত",
+    "absent": "অনুপস্থিত",
+    "markAllPresent": "সবাই উপস্থিত চিহ্নিত করুন",
+    "markAllAbsent": "সবাই অনুপস্থিত চিহ্নিত করুন"
+  },
+  "dashboard": {
+    "welcome": "স্বাগতম",
+    "overview": "সারসংক্ষেপ",
+    "totalBatches": "মোট ব্যাচ",
+    "totalStudents": "মোট শিক্ষার্থী",
+    "activeBatches": "সক্রিয় ব্যাচ",
+    "graduatedBatches": "স্নাতক ব্যাচ"
+  },
+  "reports": {
+    "reports": "রিপোর্ট",
+    "generateReport": "রিপোর্ট তৈরি করুন",
+    "downloadPdf": "PDF ডাউনলোড করুন"
+  }
+}

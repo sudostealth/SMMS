@@ -1,0 +1,103 @@
+{
+  "common": {
+    "gusmp": "GUSMP",
+    "fullName": "Green University Student Mentorship Program",
+    "universityName": "Green University of Bangladesh",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "save": "Save",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "batches": "Batches",
+    "createBatch": "Create Batch",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "signUp": "Sign Up",
+    "signIn": "Sign In",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full Name",
+    "universityId": "University ID",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "welcomeBack": "Welcome back!",
+    "createAccount": "Create your account"
+  },
+  "batch": {
+    "batchName": "Batch Name",
+    "department": "Department",
+    "section": "Section",
+    "semester": "Semester",
+    "status": "Status",
+    "active": "Active",
+    "graduated": "Graduated",
+    "createBatch": "Create Batch",
+    "totalStudents": "Total Students",
+    "totalSessions": "Total Sessions",
+    "attendancePercentage": "Attendance",
+    "markAsGraduated": "Mark as Graduated",
+    "spring": "Spring",
+    "summer": "Summer",
+    "fall": "Fall"
+  },
+  "student": {
+    "student": "Student",
+    "students": "Students",
+    "addStudent": "Add Student",
+    "name": "Name",
+    "studentId": "Student ID",
+    "phone": "Phone",
+    "email": "Email",
+    "bulkUpload": "Bulk Upload",
+    "uploadCsv": "Upload CSV",
+    "uploadExcel": "Upload Excel",
+    "deleteStudent": "Delete Student"
+  },
+  "session": {
+    "session": "Session",
+    "sessions": "Sessions",
+    "createSession": "Create Session",
+    "sessionNumber": "Session Number",
+    "sessionDate": "Session Date",
+    "method": "Method",
+    "online": "Online",
+    "offline": "Offline",
+    "platform": "Platform",
+    "roomNumber": "Room Number"
+  },
+  "attendance": {
+    "attendance": "Attendance",
+    "markAttendance": "Mark Attendance",
+    "present": "Present",
+    "absent": "Absent",
+    "markAllPresent": "Mark All Present",
+    "markAllAbsent": "Mark All Absent"
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "overview": "Overview",
+    "totalBatches": "Total Batches",
+    "totalStudents": "Total Students",
+    "activeBatches": "Active Batches",
+    "graduatedBatches": "Graduated Batches"
+  },
+  "reports": {
+    "reports": "Reports",
+    "generateReport": "Generate Report",
+    "downloadPdf": "Download PDF"
+  }
+}
