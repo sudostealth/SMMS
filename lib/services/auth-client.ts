@@ -58,3 +58,28 @@ export async function signOut() {
     throw new Error(error.message);
   }
 }
+
+export async function checkAvailability(email: string, studentId: string) {
+  const supabase = createBrowserClient();
+  const { data, error } = await supabase.rpc('check_registration_availability', {
+    p_email: email,
+    p_student_id: studentId,
+  });
+
+  if (error) {
+    // If function doesn't exist, we might get an error.
+    // In dev environment without migration applied, this will fail.
+    // For now, we assume migration is applied.
+    console.error("Availability check failed:", error);
+    // Fallback to allow registration attempt and let DB constraint handle it if possible
+    // But ideally we throw error or return false.
+    // Given the requirement "must show error messages", we should probably surface this.
+    throw new Error(error.message);
+  }
+
+  if (Array.isArray(data) && data.length > 0) {
+    return data[0] as { email_exists: boolean; student_id_exists: boolean };
+  }
+
+  return { email_exists: false, student_id_exists: false };
+}
