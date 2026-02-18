@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signUp } from "@/lib/services/auth-client";
+import { signUp, checkAvailability } from "@/lib/services/auth-client";
 import { signUpSchema, type SignUpInput } from "@/lib/validations/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,7 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
     watch,
   } = useForm<SignUpInput>({
@@ -36,6 +37,30 @@ export default function RegisterPage() {
   const onSubmit = async (data: SignUpInput) => {
     setIsLoading(true);
     try {
+      // Check availability first
+      try {
+        const availability = await checkAvailability(data.email, data.student_id);
+
+        let hasError = false;
+        if (availability.email_exists) {
+          setError('email', { type: 'manual', message: 'Email already exists' });
+          hasError = true;
+        }
+        if (availability.student_id_exists) {
+           setError('student_id', { type: 'manual', message: 'Student ID already exists' });
+           hasError = true;
+        }
+
+        if (hasError) {
+          setIsLoading(false);
+          return;
+        }
+      } catch (checkError) {
+        console.error("Availability check failed", checkError);
+        // We continue to try signUp if check fails, in case it's a transient network error
+        // and the backend handles uniqueness anyway.
+      }
+
       await signUp(data);
       setIsSuccess(true);
       toast({
@@ -123,7 +148,7 @@ export default function RegisterPage() {
               <Input
                 id="student_id"
                 type="text"
-                placeholder="231XXXXX"
+                placeholder="231XXXXXX"
                 {...register("student_id")}
                 disabled={isLoading}
                 maxLength={9}
@@ -170,7 +195,7 @@ export default function RegisterPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="student.green.ac.bd"
+                placeholder="231XXXXXX@student.green.ac.bd"
                 {...register("email")}
                 disabled={isLoading}
                  className="bg-white/50 dark:bg-gray-800/50"
