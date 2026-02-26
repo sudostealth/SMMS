@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, ArrowLeft, Check, X, UserCheck, UserX, Users } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { Attendance } from "@/types";
 
 interface Student {
   id: string;
@@ -23,12 +24,14 @@ interface AttendanceMarkingPageProps {
   };
   students: Student[];
   sessionNumber: number;
+  existingAttendance: Attendance[];
 }
 
 export default function AttendanceMarkingClient({
   params,
   students,
   sessionNumber,
+  existingAttendance,
 }: AttendanceMarkingPageProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -40,14 +43,23 @@ export default function AttendanceMarkingClient({
     a.student_id.localeCompare(b.student_id)
   );
 
-  // Initialize all students as Present by default
+  // Initialize attendance from existing records or default to Present
   useEffect(() => {
     const initialAttendance: Record<string, "Present" | "Absent"> = {};
+
+    // Create a map of existing attendance for faster lookup
+    const existingMap = new Map(existingAttendance?.map(a => [a.student_id, a.status]) || []);
+
     students.forEach((student) => {
-      initialAttendance[student.id] = "Present";
+      if (existingMap.has(student.id)) {
+        initialAttendance[student.id] = existingMap.get(student.id)!;
+      } else {
+        // If no existing record, default to Present
+        initialAttendance[student.id] = "Present";
+      }
     });
     setAttendance(initialAttendance);
-  }, [students]);
+  }, [students, existingAttendance]);
 
   const toggleAttendance = (studentId: string) => {
     setAttendance((prev) => ({
