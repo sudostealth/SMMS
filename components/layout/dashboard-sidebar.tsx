@@ -128,6 +128,7 @@ export default function DashboardSidebar({ mentor }: DashboardSidebarProps) {
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={true}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={cn(
                     "flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors",
