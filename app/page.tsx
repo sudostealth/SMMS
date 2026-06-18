@@ -6,63 +6,34 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LanguageToggle } from "@/components/ui/language-toggle";
 import { useLanguage } from "@/components/providers/language-provider";
 
-import { GraduationCap, Users, CalendarCheck, BarChart3, ArrowRight } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { GraduationCap, Users, CalendarCheck, BarChart3, ArrowRight, Github, Facebook, Linkedin } from "lucide-react";
+import { useEffect, useState } from "react";
 import { GLSLHills } from "@/components/ui/canvas/GLSLHills";
-import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
+import Image from "next/image";
 
 export default function HomePage() {
   const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
-  const container = useRef<HTMLDivElement>(null);
-  const section1 = useRef<HTMLDivElement>(null);
-  const section2 = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
-    gsap.registerPlugin(ScrollTrigger);
   }, []);
-
-  useGSAP(() => {
-    if (!mounted) return;
-
-    // The Curtain Reveal Animation
-    // We animate the clip-path of Section 1 to shrink upwards as we scroll
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: container.current,
-        start: "top top",
-        end: "+=100%", // The animation lasts for 1 viewport height of scroll
-        scrub: 1,
-        pin: true, // Pin the entire container so it stays in place while animating
-      }
-    });
-
-    tl.to(section1.current, {
-      clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)", // Shrink from bottom to top
-      ease: "none",
-    });
-  }, { scope: container, dependencies: [mounted] });
 
   if (!mounted) return null;
 
   return (
-    <div className="relative" ref={container}>
-      {/* Section 1: New Hero Layer (The WebGL Ambient Banner) */}
-      <div
-        ref={section1}
-        className="absolute top-0 left-0 w-full h-screen z-20 bg-background overflow-hidden"
-        style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }}
-      >
-        {/* Background Layer: GLSLHills */}
-        <div className="absolute inset-0 z-0">
-          <GLSLHills width="100%" height="100%" />
-        </div>
+    <div className="relative min-h-screen w-full flex flex-col font-[family-name:var(--font-geist-sans)]">
 
-        {/* Header */}
-        <header className="absolute top-0 left-0 w-full z-50 border-b bg-white/70 dark:bg-gray-900/70 backdrop-blur-md transition-all duration-300">
+      {/* Global Fixed WebGL Background */}
+      <div className="fixed inset-0 z-0 w-full h-full overflow-hidden pointer-events-none">
+        <GLSLHills width="100%" height="100%" />
+      </div>
+
+      {/* Main Container */}
+      <div className="relative z-10 flex flex-col min-h-screen">
+
+        {/* Header (Glassmorphic) */}
+        <header className="sticky top-0 w-full z-50 border-b border-border/20 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md transition-all duration-300">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center space-x-2 group cursor-pointer">
               <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
@@ -81,61 +52,7 @@ export default function HomePage() {
         </header>
 
         {/* Content Overlay Layer / Foreground */}
-        <div className="relative z-10 w-full h-full flex flex-col items-center justify-center pointer-events-none">
-          <div className="text-center space-y-6 max-w-4xl px-4 pointer-events-auto">
-             <div className="inline-flex items-center gap-2 px-4 py-2 bg-background/80 backdrop-blur-sm rounded-full border border-primary/20 cursor-default shadow-sm mb-4">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-              </span>
-              <p className="text-sm font-medium text-primary">
-                Green University of Bangladesh
-              </p>
-            </div>
-
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-foreground drop-shadow-sm">
-              Welcome to GUSMP
-            </h2>
-            <p className="text-xl md:text-2xl text-muted-foreground font-light tracking-wide mt-2">
-              Green University Student Mentorship Program
-            </p>
-
-            <p className="text-lg md:text-xl text-foreground/80 max-w-2xl mx-auto leading-relaxed mt-6 bg-background/30 backdrop-blur-md p-4 rounded-xl border border-border/50">
-              Manage your mentorship batches, students, sessions, and attendance all in one place.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-              <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:scale-105 transition-all duration-300 group backdrop-blur-md bg-primary/90 hover:bg-primary">
-                <Link href="/login">
-                  Login
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="text-lg px-8 py-6 rounded-full border-2 hover:bg-primary/5 hover:scale-105 transition-all duration-300 backdrop-blur-md bg-background/50">
-                <Link href="/register">Sign Up</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Section 2: Old Hero & Features Component Grid */}
-      <div
-        ref={section2}
-        className="relative w-full min-h-screen z-10 flex flex-col bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-gray-900 dark:via-gray-800 dark:to-slate-900"
-      >
-        {/* Animated Background Elements for Section 2 */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))] opacity-20"></div>
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-40 -left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
-        </div>
-
-        {/* Header filler to match spacing if needed, though this section is revealed underneath */}
-        <div className="h-[73px] w-full shrink-0"></div>
-
-        <main className="flex-1 container mx-auto px-4 py-12 flex flex-col items-center justify-center relative z-10">
+        <main className="flex-1 container mx-auto px-4 py-12 sm:py-20 flex flex-col items-center justify-center relative z-10">
           <div className="text-center space-y-8 max-w-5xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 dark:bg-primary/20 rounded-full border border-primary/20 hover:bg-primary/20 transition-colors cursor-default">
               <span className="relative flex h-2 w-2">
@@ -146,14 +63,14 @@ export default function HomePage() {
                 {t("greenUniversity")}
               </p>
             </div>
-            
+
             <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-gray-900 dark:text-white drop-shadow-sm">
               {t("welcome")}
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary via-green-500 to-emerald-600 mt-2 pb-2">
                 {t("subtitle")}
               </span>
             </h2>
-            
+
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
               {t("description")}
             </p>
@@ -171,7 +88,7 @@ export default function HomePage() {
             </div>
 
             {/* Features Grid */}
-            <div className="grid md:grid-cols-4 gap-6 pt-20 text-left">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-16 sm:pt-20 text-left w-full">
               <div className="group bg-white/60 dark:bg-gray-800/60 p-6 rounded-2xl shadow-xl hover:shadow-2xl border border-white/20 dark:border-gray-700/50 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1">
                 <div className="h-12 w-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                   <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -215,18 +132,37 @@ export default function HomePage() {
           </div>
         </main>
 
-        {/* Section 3: Academic Credits Footer */}
-        <div className="mt-auto bg-background/80 backdrop-blur-sm border-t border-border">
-          <div className="container mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between text-sm text-muted-foreground gap-4">
-            <div className="flex items-center gap-2">
+        {/* Revamped Footer */}
+        <footer className="mt-auto bg-white/40 dark:bg-gray-900/40 backdrop-blur-md border-t border-border/20">
+          <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <Image
+                src="https://avatars.githubusercontent.com/u/122990604?v=4"
+                alt="Developer Profile"
+                width={48}
+                height={48}
+                className="rounded-full border-2 border-primary/50 shadow-sm"
+              />
+              <div className="flex flex-col">
+                <span className="font-semibold text-gray-900 dark:text-white">Developer</span>
+                <div className="flex items-center gap-3 mt-1 text-muted-foreground">
+                  <a href="#" className="hover:text-primary transition-colors"><Github className="h-4 w-4" /></a>
+                  <a href="#" className="hover:text-primary transition-colors"><Facebook className="h-4 w-4" /></a>
+                  <a href="#" className="hover:text-primary transition-colors"><Linkedin className="h-4 w-4" /></a>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <GraduationCap className="h-5 w-5 text-primary" />
               <span className="font-medium text-foreground">Green University of Bangladesh</span>
             </div>
-            <div>
-              &copy; {new Date().getFullYear()} GUSMP - Mentor Management System. All rights reserved.
+
+            <div className="text-sm text-muted-foreground text-center md:text-right">
+              &copy; {new Date().getFullYear()} GUSMP - Mentor Management System.<br className="hidden sm:block md:hidden" /> All rights reserved.
             </div>
           </div>
-        </div>
+        </footer>
       </div>
     </div>
   );
