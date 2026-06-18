@@ -10,6 +10,7 @@ import { GraduationCap, Users, CalendarCheck, BarChart3, ArrowRight, Github, Fac
 import { useEffect, useState } from "react";
 import { GLSLHills } from "@/components/ui/canvas/GLSLHills";
 import Image from "next/image";
+import Footer from "@/components/layout/footer";
 
 export default function HomePage() {
   const { t } = useLanguage();
@@ -33,7 +34,7 @@ export default function HomePage() {
       <div className="relative z-10 flex flex-col min-h-screen">
 
         {/* Header (Glassmorphic) */}
-        <header className="sticky top-0 w-full z-50 border-b border-border/20 bg-white/40 dark:bg-gray-900/40 backdrop-blur-md transition-all duration-300">
+        <header className="sticky top-0 w-full z-50 border-b border-border/20 bg-white/70 dark:bg-gray-900/70 backdrop-blur-md transition-all duration-300 shadow-sm">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center space-x-2 group cursor-pointer">
               <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
@@ -41,7 +42,7 @@ export default function HomePage() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">GUSMP</h1>
-                <p className="text-xs text-muted-foreground">{t("mentorManagement")}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">{t("mentorManagement")}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -133,36 +134,7 @@ export default function HomePage() {
         </main>
 
         {/* Revamped Footer */}
-        <footer className="mt-auto bg-white/40 dark:bg-gray-900/40 backdrop-blur-md border-t border-border/20">
-          <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <Image
-                src="https://avatars.githubusercontent.com/u/122990604?v=4"
-                alt="Developer Profile"
-                width={48}
-                height={48}
-                className="rounded-full border-2 border-primary/50 shadow-sm"
-              />
-              <div className="flex flex-col">
-                <span className="font-semibold text-gray-900 dark:text-white">Developer</span>
-                <div className="flex items-center gap-3 mt-1 text-muted-foreground">
-                  <a href="#" className="hover:text-primary transition-colors"><Github className="h-4 w-4" /></a>
-                  <a href="#" className="hover:text-primary transition-colors"><Facebook className="h-4 w-4" /></a>
-                  <a href="#" className="hover:text-primary transition-colors"><Linkedin className="h-4 w-4" /></a>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <GraduationCap className="h-5 w-5 text-primary" />
-              <span className="font-medium text-foreground">Green University of Bangladesh</span>
-            </div>
-
-            <div className="text-sm text-muted-foreground text-center md:text-right">
-              &copy; {new Date().getFullYear()} GUSMP - Mentor Management System.<br className="hidden sm:block md:hidden" /> All rights reserved.
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </div>
   );

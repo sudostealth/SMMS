@@ -4,7 +4,22 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search } from "lucide-react";
+import { Search, Edit, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
+import { deleteStudentAction } from "@/app/(dashboard)/actions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface Student {
   id: string;
@@ -22,13 +37,37 @@ interface AttendanceStats {
 }
 
 interface StudentSearchProps {
+  batchId: string;
   students: Student[];
   sessions: any[];
   attendanceBySession: Map<string, any[]>;
 }
 
-export default function StudentSearch({ students, sessions, attendanceBySession }: StudentSearchProps) {
+export default function StudentSearch({ batchId, students, sessions, attendanceBySession }: StudentSearchProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+
+  const handleDelete = async (studentId: string) => {
+    setIsDeleting(studentId);
+    try {
+      const result = await deleteStudentAction(batchId, studentId);
+      if (!result.success) throw new Error(result.error);
+
+      toast({
+        title: "Success",
+        description: "Student deleted successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to delete student",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(null);
+    }
+  };
 
   // Calculate attendance statistics for each student
   const studentStats = useMemo(() => {
@@ -113,12 +152,43 @@ export default function StudentSearch({ students, sessions, attendanceBySession 
                         {student.email && ` • ${student.email}`}
                       </CardDescription>
                     </div>
-                    <Badge 
-                      variant={stats.percentage >= 75 ? "default" : stats.percentage >= 50 ? "secondary" : "destructive"}
-                      className="ml-2"
-                    >
-                      {stats.percentage}%
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant={stats.percentage >= 75 ? "default" : stats.percentage >= 50 ? "secondary" : "destructive"}
+                        className="ml-2"
+                      >
+                        {stats.percentage}%
+                      </Badge>
+                      <Button variant="ghost" size="icon" asChild className="h-8 w-8">
+                        <Link href={`/batches/${batchId}/students/${student.id}/edit`} prefetch={true}>
+                          <Edit className="h-4 w-4 text-muted-foreground hover:text-primary" />
+                        </Link>
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" disabled={isDeleting === student.id}>
+                            <Trash2 className="h-4 w-4 text-destructive hover:text-red-700" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete <b>{student.name}</b> and remove all their attendance records from our servers.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(student.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>

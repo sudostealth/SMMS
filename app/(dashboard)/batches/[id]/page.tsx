@@ -173,6 +173,7 @@ export default async function BatchDetailPage({
             </CardHeader>
             <CardContent>
               <StudentSearch 
+                batchId={id}
                 students={students} 
                 sessions={sessions}
                 attendanceBySession={attendanceBySession}
@@ -216,12 +217,12 @@ export default async function BatchDetailPage({
                       </div>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/batches/${id}/sessions/${session.id}/edit`}>
+                          <Link href={`/batches/${id}/sessions/${session.id}/edit`} prefetch={true}>
                             Edit
                           </Link>
                         </Button>
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/batches/${id}/sessions/${session.id}/attendance`}>
+                          <Link href={`/batches/${id}/sessions/${session.id}/attendance`} prefetch={true}>
                             Mark Attendance
                           </Link>
                         </Button>

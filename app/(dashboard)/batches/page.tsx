@@ -48,7 +48,7 @@ export default async function BatchesPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {batches.map((batch) => (
-            <Link key={batch.id} href={`/batches/${batch.id}`}>
+            <Link key={batch.id} href={`/batches/${batch.id}`} prefetch={true}>
               <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
                 <CardHeader>
                   <div className="flex items-start justify-between">

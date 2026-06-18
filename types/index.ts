@@ -17,7 +17,6 @@ export interface Batch {
   department_name: string;
   section: string;
   semester: string;
-  academic_year: string;
   student_id_start?: string;
   student_id_end?: string;
   status: string;
