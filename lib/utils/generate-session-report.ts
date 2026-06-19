@@ -4,6 +4,27 @@ import { format } from "date-fns";
 import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, ImageRun, BorderStyle, HeadingLevel } from "docx";
 import { saveAs } from "file-saver";
 
+const svgToPngDataUrl = async (svgUrl: string, width: number, height: number): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/png'));
+      } else {
+        reject(new Error("Could not get canvas context"));
+      }
+    };
+    img.onerror = reject;
+    img.src = svgUrl;
+  });
+};
+
 interface Batch {
   batch_name: string;
   department_name: string;
@@ -63,29 +84,36 @@ export const generateSessionReportPdf = async (
   const presentCount = attendanceRecords.filter((r) => r.status === "Present").length;
   const absentCount = students.length - presentCount;
 
-  // Add logos if possible (will skip if it fails)
-  // For jsPDF, we can't easily add SVG directly without canvas. We'll add text for the header.
+  try {
+    const gubLogoDataUrl = await svgToPngDataUrl("/GUBLogo.svg", 200, 200);
+    const cseLogoDataUrl = await svgToPngDataUrl("/cse-logo.svg", 200, 200);
+    // Add logos at the top
+    doc.addImage(gubLogoDataUrl, "PNG", 75, 10, 20, 20);
+    doc.addImage(cseLogoDataUrl, "PNG", 115, 10, 20, 20);
+  } catch (error) {
+    console.error("Failed to load logos for PDF", error);
+  }
 
   // Header Text
   doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
-  doc.text("Green University Student Mentorship Program", 105, 20, { align: "center" });
+  doc.text("Green University Student Mentorship Program", 105, 36, { align: "center" });
 
   doc.setFontSize(14);
   doc.setFont("helvetica", "normal");
-  doc.text("Department of Computer Science & Engineering", 105, 28, { align: "center" });
+  doc.text("Department of Computer Science & Engineering", 105, 44, { align: "center" });
 
   doc.setFontSize(12);
-  doc.text("Green University of Bangladesh", 105, 36, { align: "center" });
+  doc.text("Green University of Bangladesh", 105, 52, { align: "center" });
 
   doc.setLineWidth(0.5);
-  doc.line(14, 42, 196, 42);
+  doc.line(14, 58, 196, 58);
 
   // Split details into two columns
   doc.setFontSize(10);
 
   // Left Column
-  let startY = 50;
+  let startY = 66;
   let lineSpacing = 6;
   doc.text(`Mentor Name: ${mentorName}`, 14, startY);
 
@@ -126,21 +154,25 @@ export const generateSessionReportPdf = async (
       2: { cellWidth: 35 },
       3: { cellWidth: 40 }
     },
-    didDrawPage: (data) => {
-        // Signatures at the bottom
-        const pageHeight = doc.internal.pageSize.height;
-        const pageCount = (doc as any).internal.getNumberOfPages();
-        doc.setPage(pageCount);
-
-        doc.setLineWidth(0.5);
-        doc.line(14, pageHeight - 30, 74, pageHeight - 30);
-        doc.text("Mentor Moderator, Dept. of CSE", 14, pageHeight - 25);
-
-        doc.line(136, pageHeight - 30, 196, pageHeight - 30);
-        doc.text("Chairperson, Dept. of CSE", 136, pageHeight - 25);
-    }
   });
 
+  // Add signatures only at the end of the document (last page)
+  const finalY = (doc as any).lastAutoTable.finalY || startY + lineSpacing * 5 + 5;
+  const pageHeight = doc.internal.pageSize.height;
+
+  // If there's not enough space for signatures, add a new page
+  if (finalY + 40 > pageHeight) {
+    doc.addPage();
+  }
+
+  const signatureY = doc.internal.pageSize.height - 30;
+
+  doc.setLineWidth(0.5);
+  doc.line(14, signatureY, 74, signatureY);
+  doc.text("Mentor Moderator, Dept. of CSE", 14, signatureY + 5);
+
+  doc.line(136, signatureY, 196, signatureY);
+  doc.text("Chairperson, Dept. of CSE", 136, signatureY + 5);
 
   doc.save(`Session_${session.session_number}_Report.pdf`);
 };
@@ -159,14 +191,47 @@ export const generateSessionReportDocx = async (
   const idRange = sortedStudents.length > 0 ? `${sortedStudents[0].student_id} - ${sortedStudents[sortedStudents.length - 1].student_id}` : "N/A";
   const location = session.method === "Online" ? session.platform : `Room ${session.room_number}`;
 
-  // Logos (skipping images for DOCX since it requires ArrayBuffer of image which might be tricky in browser without CORS issues if fetching SVGs)
-  // We'll rely on text for DOCX for now for simplicity and reliability.
+  let logoParagraphs: Paragraph[] = [];
+  try {
+    const gubLogoDataUrl = await svgToPngDataUrl("/GUBLogo.svg", 100, 100);
+    const cseLogoDataUrl = await svgToPngDataUrl("/cse-logo.svg", 100, 100);
+
+    // Extract base64 part
+    const gubBase64 = gubLogoDataUrl.split(',')[1];
+    const cseBase64 = cseLogoDataUrl.split(',')[1];
+
+    // Decode base64 to ArrayBuffer
+    const gubBuffer = Uint8Array.from(atob(gubBase64), c => c.charCodeAt(0)).buffer;
+    const cseBuffer = Uint8Array.from(atob(cseBase64), c => c.charCodeAt(0)).buffer;
+
+    logoParagraphs = [
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [
+          new ImageRun({
+            data: gubBuffer,
+            transformation: { width: 50, height: 50 },
+            type: "png"
+          }),
+          new TextRun({ text: "   " }), // Spacing between logos
+          new ImageRun({
+            data: cseBuffer,
+            transformation: { width: 50, height: 50 },
+            type: "png"
+          }),
+        ],
+      }),
+    ];
+  } catch (error) {
+    console.error("Failed to load logos for DOCX", error);
+  }
 
   const doc = new Document({
     sections: [
       {
         properties: {},
         children: [
+          ...logoParagraphs,
           new Paragraph({
             text: "Green University Student Mentorship Program",
             heading: HeadingLevel.HEADING_1,

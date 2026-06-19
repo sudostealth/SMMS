@@ -33,7 +33,7 @@ export default async function BatchDetailPage({
   // Fetch attendance data for all sessions
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
-  const mentorName = userData.user?.user_metadata?.name || "Mentor";
+  const mentorName = userData.user?.user_metadata?.full_name || "Mentor";
   const attendanceBySession = new Map();
   const attendanceData: Record<string, any[]> = {}; // For PDF generation and serialization
   
