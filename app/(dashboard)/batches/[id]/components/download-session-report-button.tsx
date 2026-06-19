@@ -8,8 +8,16 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface DownloadSessionReportButtonProps {
   batch: any;
@@ -44,27 +52,42 @@ export function DownloadSessionReportButton({
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" disabled={isGenerating}>
-          {isGenerating ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Download className="mr-2 h-4 w-4" />
-          )}
-          Report
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => handleDownload('pdf')} className="cursor-pointer">
-          <FileIcon className="mr-2 h-4 w-4" />
-          Download PDF
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleDownload('docx')} className="cursor-pointer">
-          <FileText className="mr-2 h-4 w-4" />
-          Download DOCX
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <TooltipProvider>
+      <Tooltip delayDuration={300}>
+        <TooltipTrigger asChild>
+          <div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" disabled={isGenerating}>
+                  {isGenerating ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Download className="mr-2 h-4 w-4" />
+                  )}
+                  Report
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="font-normal text-xs text-muted-foreground pb-2">
+                  <span className="font-medium text-foreground">Tip:</span> We recommend downloading DOCX. It is fully editable and has no layout issues compared to PDF.
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => handleDownload('docx')} className="cursor-pointer font-medium text-primary">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Download DOCX (Recommended)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDownload('pdf')} className="cursor-pointer">
+                  <FileIcon className="mr-2 h-4 w-4" />
+                  Download PDF
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-[250px] text-center">
+          <p>We recommend DOCX format for editability and better layout.</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
