@@ -202,6 +202,7 @@ export default function BatchEdit({ batch }: BatchEditProps) {
                 <SelectItem value="Active">Active</SelectItem>
                 <SelectItem value="Inactive">Inactive</SelectItem>
                 <SelectItem value="Completed">Completed</SelectItem>
+                <SelectItem value="Graduated">Graduated</SelectItem>
               </SelectContent>
             </Select>
           </div>

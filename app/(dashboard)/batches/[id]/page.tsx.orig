@@ -33,12 +33,9 @@ export default async function BatchDetailPage({
   const supabase = await createClient();
   const attendanceBySession = new Map();
   const attendanceData: Record<string, any[]> = {}; // For PDF generation and serialization
-  
-  if (sessions.length > 0) {
-    const sessionIds = sessions.map(s => s.id);
 
-    // Single query to fetch all attendance records for the sessions in this batch
-    const { data: allAttendanceRecords } = await supabase
+  for (const session of sessions) {
+    const { data: attendanceRecords } = await supabase
       .from("attendance")
       .select(`
         *,
@@ -47,21 +44,11 @@ export default async function BatchDetailPage({
           student_id
         )
       `)
-      .in("session_id", sessionIds)
+      .eq("session_id", session.id)
       .order("created_at");
 
-    if (allAttendanceRecords) {
-      for (const session of sessions) {
-        const sessionRecords = allAttendanceRecords.filter(r => r.session_id === session.id);
-        attendanceBySession.set(session.id, sessionRecords);
-        attendanceData[session.id] = sessionRecords;
-      }
-    } else {
-      for (const session of sessions) {
-        attendanceBySession.set(session.id, []);
-        attendanceData[session.id] = [];
-      }
-    }
+    attendanceBySession.set(session.id, attendanceRecords || []);
+    attendanceData[session.id] = attendanceRecords || [];
   }
 
   // Calculate overall attendance percentage
@@ -185,9 +172,9 @@ export default async function BatchDetailPage({
               </div>
             </CardHeader>
             <CardContent>
-              <StudentSearch 
+              <StudentSearch
                 batchId={id}
-                students={students} 
+                students={students}
                 sessions={sessions}
                 attendanceBySession={attendanceBySession}
               />

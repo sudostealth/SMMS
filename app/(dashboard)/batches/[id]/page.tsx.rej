@@ -1,0 +1,42 @@
+--- app/(dashboard)/batches/[id]/page.tsx
++++ app/(dashboard)/batches/[id]/page.tsx
+@@ -29,23 +29,23 @@
+   const sessions = await getSessionsByBatch(id);
+
+   // Fetch attendance data for all sessions
+   const supabase = await createClient();
+   const attendanceBySession = new Map();
+   const attendanceData: Record<string, any[]> = {}; // For PDF generation and serialization
+
+-  for (const session of sessions) {
+-    const { data: attendanceRecords } = await supabase
+-      .from("attendance")
+-      .select(`
+-        *,
+-        students:student_id (
+-          name,
+-          student_id
+-        )
+-      `)
+-      .eq("session_id", session.id)
+-      .order("created_at");
+-
+-    attendanceBySession.set(session.id, attendanceRecords || []);
+-    attendanceData[session.id] = attendanceRecords || [];
+-  }
++  if (sessions.length > 0) {
++    const sessionIds = sessions.map(s => s.id);
++
++    // Single query to fetch all attendance records for the sessions in this batch
++    const { data: allAttendanceRecords } = await supabase
++      .from("attendance")
++      .select(`*, students:student_id (name, student_id)`)
++      .in("session_id", sessionIds)
++      .order("created_at");
++
++    if (allAttendanceRecords) {
++      for (const session of sessions) {
++        const sessionRecords = allAttendanceRecords.filter(r => r.session_id === session.id);
++        attendanceBySession.set(session.id, sessionRecords);
++        attendanceData[session.id] = sessionRecords;
++      }
