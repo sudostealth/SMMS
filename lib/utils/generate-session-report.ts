@@ -86,24 +86,23 @@ export const generateSessionReportPdf = async (
 
   try {
     const gubLogoDataUrl = await svgToPngDataUrl("/GUBLogo.svg", 200, 200);
-    const cseLogoDataUrl = await svgToPngDataUrl("/cse-logo.svg", 200, 200);
-    // Add logos at the top
-    doc.addImage(gubLogoDataUrl, "PNG", 75, 10, 20, 20);
-    doc.addImage(cseLogoDataUrl, "PNG", 115, 10, 20, 20);
+    // Add logo at the top center
+    doc.addImage(gubLogoDataUrl, "PNG", 95, 10, 20, 20);
   } catch (error) {
     console.error("Failed to load logos for PDF", error);
   }
 
   // Header Text
   doc.setFontSize(16);
-  doc.setFont("helvetica", "bold");
+  doc.setFont("times", "bold");
   doc.text("Green University Student Mentorship Program", 105, 36, { align: "center" });
 
   doc.setFontSize(14);
-  doc.setFont("helvetica", "normal");
-  doc.text("Department of Computer Science & Engineering", 105, 44, { align: "center" });
+  doc.setFont("times", "bold");
+  doc.text(`Department of ${batch.department_name}`, 105, 44, { align: "center" });
 
   doc.setFontSize(12);
+  doc.setFont("times", "bold");
   doc.text("Green University of Bangladesh", 105, 52, { align: "center" });
 
   doc.setLineWidth(0.5);
@@ -111,6 +110,7 @@ export const generateSessionReportPdf = async (
 
   // Split details into two columns
   doc.setFontSize(10);
+  doc.setFont("times", "normal");
 
   // Left Column
   let startY = 66;
@@ -146,8 +146,8 @@ export const generateSessionReportPdf = async (
     head: [["Student ID", "Student Name", "Present/Absent", "Student Signature"]],
     body: tableData,
     theme: "grid",
-    headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
-    styles: { cellPadding: 3, fontSize: 10, minCellHeight: 12, valign: "middle" },
+    headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold', font: 'times' },
+    styles: { cellPadding: 3, fontSize: 10, minCellHeight: 12, valign: "middle", font: 'times' },
     columnStyles: {
       0: { cellWidth: 35 },
       1: { cellWidth: 70 },
@@ -169,10 +169,10 @@ export const generateSessionReportPdf = async (
 
   doc.setLineWidth(0.5);
   doc.line(14, signatureY, 74, signatureY);
-  doc.text("Mentor Moderator, Dept. of CSE", 14, signatureY + 5);
+  doc.text(`Mentor Moderator, Dept. of ${batch.department_name}`, 14, signatureY + 5);
 
   doc.line(136, signatureY, 196, signatureY);
-  doc.text("Chairperson, Dept. of CSE", 136, signatureY + 5);
+  doc.text(`Chairperson, Dept. of ${batch.department_name}`, 136, signatureY + 5);
 
   doc.save(`Session_${session.session_number}_Report.pdf`);
 };
@@ -194,15 +194,12 @@ export const generateSessionReportDocx = async (
   let logoParagraphs: Paragraph[] = [];
   try {
     const gubLogoDataUrl = await svgToPngDataUrl("/GUBLogo.svg", 100, 100);
-    const cseLogoDataUrl = await svgToPngDataUrl("/cse-logo.svg", 100, 100);
 
     // Extract base64 part
     const gubBase64 = gubLogoDataUrl.split(',')[1];
-    const cseBase64 = cseLogoDataUrl.split(',')[1];
 
     // Decode base64 to ArrayBuffer
     const gubBuffer = Uint8Array.from(atob(gubBase64), c => c.charCodeAt(0)).buffer;
-    const cseBuffer = Uint8Array.from(atob(cseBase64), c => c.charCodeAt(0)).buffer;
 
     logoParagraphs = [
       new Paragraph({
@@ -210,12 +207,6 @@ export const generateSessionReportDocx = async (
         children: [
           new ImageRun({
             data: gubBuffer,
-            transformation: { width: 50, height: 50 },
-            type: "png"
-          }),
-          new TextRun({ text: "   " }), // Spacing between logos
-          new ImageRun({
-            data: cseBuffer,
             transformation: { width: 50, height: 50 },
             type: "png"
           }),
@@ -227,24 +218,36 @@ export const generateSessionReportDocx = async (
   }
 
   const doc = new Document({
+    styles: {
+        default: {
+            document: {
+                run: {
+                    font: "Times New Roman",
+                },
+            },
+        },
+    },
     sections: [
       {
         properties: {},
         children: [
           ...logoParagraphs,
           new Paragraph({
-            text: "Green University Student Mentorship Program",
-            heading: HeadingLevel.HEADING_1,
+            children: [
+              new TextRun({ text: "Green University Student Mentorship Program", bold: true, size: 32 }) // 16pt
+            ],
             alignment: AlignmentType.CENTER,
           }),
           new Paragraph({
-            text: "Department of Computer Science & Engineering",
-            heading: HeadingLevel.HEADING_2,
+            children: [
+              new TextRun({ text: `Department of ${batch.department_name}`, bold: true, size: 28 }) // 14pt
+            ],
             alignment: AlignmentType.CENTER,
           }),
           new Paragraph({
-            text: "Green University of Bangladesh",
-            heading: HeadingLevel.HEADING_3,
+            children: [
+              new TextRun({ text: "Green University of Bangladesh", bold: true, size: 24 }) // 12pt
+            ],
             alignment: AlignmentType.CENTER,
             spacing: { after: 400 },
           }),
@@ -334,13 +337,13 @@ export const generateSessionReportDocx = async (
                   new TableCell({
                     children: [
                       new Paragraph("________________________________"),
-                      new Paragraph("Mentor Moderator, Dept. of CSE"),
+                      new Paragraph(`Mentor Moderator, Dept. of ${batch.department_name}`),
                     ],
                   }),
                   new TableCell({
                     children: [
                       new Paragraph({ text: "________________________________", alignment: AlignmentType.RIGHT }),
-                      new Paragraph({ text: "Chairperson, Dept. of CSE", alignment: AlignmentType.RIGHT }),
+                      new Paragraph({ text: `Chairperson, Dept. of ${batch.department_name}`, alignment: AlignmentType.RIGHT }),
                     ],
                   }),
                 ],
