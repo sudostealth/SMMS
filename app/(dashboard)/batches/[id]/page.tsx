@@ -10,6 +10,7 @@ import StudentSearch from "./components/student-search";
 import CollapsibleAttendance from "./components/collapsible-attendance";
 import BatchEdit from "./components/batch-edit";
 import { DownloadReportButton } from "./components/download-report-button";
+import { DownloadSessionReportButton } from "./components/download-session-report-button";
 import Link from "next/link";
 import { ArrowLeft, Users, CalendarDays, Upload, Plus } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -31,6 +32,8 @@ export default async function BatchDetailPage({
 
   // Fetch attendance data for all sessions
   const supabase = await createClient();
+  const { data: userData } = await supabase.auth.getUser();
+  const mentorName = userData.user?.user_metadata?.name || "Mentor";
   const attendanceBySession = new Map();
   const attendanceData: Record<string, any[]> = {}; // For PDF generation and serialization
   
@@ -234,6 +237,13 @@ export default async function BatchDetailPage({
                             Edit
                           </Link>
                         </Button>
+                        <DownloadSessionReportButton
+                          batch={batch}
+                          students={students}
+                          session={session}
+                          attendanceData={attendanceData[session.id] || []}
+                          mentorName={mentorName}
+                        />
                         <Button variant="outline" size="sm" asChild>
                           <Link href={`/batches/${id}/sessions/${session.id}/attendance`} prefetch={true}>
                             Mark Attendance

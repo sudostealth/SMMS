@@ -64,8 +64,8 @@ export default function DeveloperPage() {
             transition={{ type: "spring", stiffness: 100, damping: 20 }}
             className="relative"
           >
-            <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400 blur opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
-            <div className="relative w-40 h-40 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-black ring-4 ring-white/10 bg-zinc-800">
+            <div className="absolute -inset-1 rounded-xl bg-gradient-to-r from-cyan-400 to-emerald-400 blur opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
+            <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-xl overflow-hidden border-4 border-black ring-4 ring-white/10 bg-zinc-800 shadow-2xl">
               <Image
                 src={developer.profileImage}
                 alt={developer.name}
@@ -73,6 +73,7 @@ export default function DeveloperPage() {
                 className="object-cover"
                 priority
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-900/40 to-transparent"></div>
             </div>
           </motion.div>
 
