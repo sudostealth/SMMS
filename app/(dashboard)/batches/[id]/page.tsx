@@ -9,8 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import StudentSearch from "./components/student-search";
 import CollapsibleAttendance from "./components/collapsible-attendance";
 import BatchEdit from "./components/batch-edit";
+import SessionList from "./components/session-list";
 import { DownloadReportButton } from "./components/download-report-button";
-import { DownloadSessionReportButton } from "./components/download-session-report-button";
 import Link from "next/link";
 import { ArrowLeft, Users, CalendarDays, Upload, Plus } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -212,48 +212,14 @@ export default async function BatchDetailPage({
                   <Link href={`/batches/${id}/sessions/create`}>Create Session</Link>
                 </Button>
               </div>
-              {sessions.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">No sessions created yet</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {sessions.map((session) => (
-                    <div
-                      key={session.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <p className="font-medium">Session {session.session_number}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(session.session_date).toLocaleDateString()} • {session.method}
-                          {session.method === "Online" && session.platform && ` • ${session.platform}`}
-                          {session.method === "Offline" && session.room_number && ` • Room ${session.room_number}`}
-                        </p>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/batches/${id}/sessions/${session.id}/edit`} prefetch={true}>
-                            Edit
-                          </Link>
-                        </Button>
-                        <DownloadSessionReportButton
-                          batch={batch}
-                          students={students}
-                          session={session}
-                          attendanceData={attendanceData[session.id] || []}
-                          mentorName={mentorName}
-                        />
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={`/batches/${id}/sessions/${session.id}/attendance`} prefetch={true}>
-                            Mark Attendance
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <SessionList
+                batchId={id}
+                sessions={sessions}
+                batch={batch}
+                students={students}
+                attendanceData={attendanceData}
+                mentorName={mentorName}
+              />
             </CardContent>
           </Card>
         </TabsContent>
