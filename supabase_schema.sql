@@ -24,7 +24,7 @@ CREATE TABLE batches (
   semester TEXT NOT NULL CHECK (semester IN ('Spring', 'Summer', 'Fall')),
   student_id_start TEXT,
   student_id_end TEXT,
-  status TEXT DEFAULT 'Active' CHECK (status IN ('Active', 'Graduated')),
+  status TEXT DEFAULT 'Active' CHECK (status IN ('Active', 'Inactive', 'Completed', 'Graduated')),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

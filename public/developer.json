@@ -1,10 +1,30 @@
 {
   "name": "MD. SAZIB",
+  "id": "231902005",
+  "batch": "231",
+  "department": "Computer Science & Engineering",
   "university": "Green University of Bangladesh",
+  "universityLogo": "https://green.edu.bd/public/images/primary-logo/GUBLogo.svg",
+  "departmentLogo": "https://cse.green.edu.bd/storage/images/cse/cse-logo.svg",
+  "profileImage": "https://avatars.githubusercontent.com/u/122990604?v=4",
   "role": "Full Stack Developer",
   "email": "mdsazib.cse@gmail.com",
   "portfolio": "https://mdsazib.vercel.app",
   "github": "https://github.com/sudostealth",
   "linkedin": "https://linkedin.com/in/immdsazib",
-  "photo": "/avatar.jpg"
+  "mentorship": {
+    "duration": "Fall 2025 - Summer 2026",
+    "departments": [
+      {
+        "name": "Computer Science & Engineering",
+        "times": 2
+      },
+      {
+        "name": "Artificial Intelligence & Data Science",
+        "times": 1
+      }
+    ]
+  },
+  "motivation": "I built this website with the help of AI and free resources, aiming to streamline and modernize the mentorship process for both mentors and mentees. Empowering education through technology has always been my driving force.",
+  "inspiringText": "To all new students and upcoming mentors: Every line of code, every challenge you face is a stepping stone to greatness. Keep learning, keep building, and never be afraid to create something that matters."
 }

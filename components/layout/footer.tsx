@@ -69,7 +69,7 @@ export default function Footer() {
       <div className="relative w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Developer Info with Animation */}
-          <div className="flex items-center gap-4 group justify-center md:justify-start flex-1">
+          <Link href="/developer" className="flex items-center gap-4 group justify-center md:justify-start flex-1 cursor-pointer">
             <div className="relative">
               {githubAvatar && (
                 <div className="relative w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden ring-2 ring-primary/50 group-hover:ring-primary transition-all duration-300 group-hover:scale-110 shadow-lg shadow-primary/20">
@@ -92,7 +92,7 @@ export default function Footer() {
               <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{developer.role}</p>
               <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-500">{developer.university}</p>
             </div>
-          </div>
+          </Link>
 
           {/* Center - Made with love */}
           <div className="text-center space-y-1 sm:space-y-2 flex-1">
