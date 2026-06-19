@@ -30,6 +30,8 @@ interface Batch {
   department_name: string;
   section: string;
   semester: string;
+  student_id_start?: string;
+  student_id_end?: string;
 }
 
 interface Student {
@@ -117,9 +119,13 @@ export const generateSessionReportPdf = async (
   let lineSpacing = 6;
   doc.text(`Mentor Name: ${mentorName}`, 14, startY);
 
-  // Sort students to find ID range
+  // Use ID range from batch configuration
+  const idRange = batch.student_id_start && batch.student_id_end
+    ? `${batch.student_id_start} - ${batch.student_id_end}`
+    : "N/A";
+
+  // Sort students for table
   const sortedStudents = [...students].sort((a, b) => a.student_id.localeCompare(b.student_id));
-  const idRange = sortedStudents.length > 0 ? `${sortedStudents[0].student_id} - ${sortedStudents[sortedStudents.length - 1].student_id}` : "N/A";
 
   doc.text(`Student ID Range: ${idRange}`, 14, startY + lineSpacing);
   doc.text(`Semester: ${batch.semester}`, 14, startY + lineSpacing * 2);
@@ -168,11 +174,15 @@ export const generateSessionReportPdf = async (
   const signatureY = doc.internal.pageSize.height - 30;
 
   doc.setLineWidth(0.5);
+  // Left signature
   doc.line(14, signatureY, 74, signatureY);
-  doc.text(`Mentor Moderator, Dept. of ${batch.department_name}`, 14, signatureY + 5);
+  doc.text("Mentor Moderator", 44, signatureY + 5, { align: "center" });
+  doc.text(`Dept. of ${batch.department_name}`, 44, signatureY + 10, { align: "center" });
 
+  // Right signature
   doc.line(136, signatureY, 196, signatureY);
-  doc.text(`Chairperson, Dept. of ${batch.department_name}`, 136, signatureY + 5);
+  doc.text("Chairperson", 166, signatureY + 5, { align: "center" });
+  doc.text(`Dept. of ${batch.department_name}`, 166, signatureY + 10, { align: "center" });
 
   doc.save(`Session_${session.session_number}_Report.pdf`);
 };
@@ -188,7 +198,12 @@ export const generateSessionReportDocx = async (
   const presentCount = attendanceRecords.filter((r) => r.status === "Present").length;
   const absentCount = students.length - presentCount;
   const sortedStudents = [...students].sort((a, b) => a.student_id.localeCompare(b.student_id));
-  const idRange = sortedStudents.length > 0 ? `${sortedStudents[0].student_id} - ${sortedStudents[sortedStudents.length - 1].student_id}` : "N/A";
+
+  // Use ID range from batch configuration
+  const idRange = batch.student_id_start && batch.student_id_end
+    ? `${batch.student_id_start} - ${batch.student_id_end}`
+    : "N/A";
+
   const location = session.method === "Online" ? session.platform : `Room ${session.room_number}`;
 
   let logoParagraphs: Paragraph[] = [];
@@ -336,14 +351,16 @@ export const generateSessionReportDocx = async (
                 children: [
                   new TableCell({
                     children: [
-                      new Paragraph("________________________________"),
-                      new Paragraph(`Mentor Moderator, Dept. of ${batch.department_name}`),
+                      new Paragraph({ text: "________________________________", alignment: AlignmentType.CENTER }),
+                      new Paragraph({ text: "Mentor Moderator", alignment: AlignmentType.CENTER }),
+                      new Paragraph({ text: `Dept. of ${batch.department_name}`, alignment: AlignmentType.CENTER }),
                     ],
                   }),
                   new TableCell({
                     children: [
-                      new Paragraph({ text: "________________________________", alignment: AlignmentType.RIGHT }),
-                      new Paragraph({ text: `Chairperson, Dept. of ${batch.department_name}`, alignment: AlignmentType.RIGHT }),
+                      new Paragraph({ text: "________________________________", alignment: AlignmentType.CENTER }),
+                      new Paragraph({ text: "Chairperson", alignment: AlignmentType.CENTER }),
+                      new Paragraph({ text: `Dept. of ${batch.department_name}`, alignment: AlignmentType.CENTER }),
                     ],
                   }),
                 ],

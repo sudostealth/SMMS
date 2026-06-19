@@ -18,6 +18,38 @@ export async function getStudentsByBatch(batchId: string): Promise<Student[]> {
   return data || [];
 }
 
+export async function getTotalStudentsForMentor(mentorId: string): Promise<number> {
+  const supabase = await createClient();
+
+  // First, get all batches for the mentor
+  const { data: batches, error: batchesError } = await supabase
+    .from("batches")
+    .select("id")
+    .eq("mentor_id", mentorId);
+
+  if (batchesError) {
+    throw new Error(batchesError.message);
+  }
+
+  if (!batches || batches.length === 0) {
+    return 0;
+  }
+
+  const batchIds = batches.map(b => b.id);
+
+  // Then, count students in those batches
+  const { count, error: countError } = await supabase
+    .from("students")
+    .select("*", { count: 'exact', head: true })
+    .in("batch_id", batchIds);
+
+  if (countError) {
+    throw new Error(countError.message);
+  }
+
+  return count || 0;
+}
+
 export async function getStudentWithAttendance(studentId: string): Promise<StudentWithAttendance | null> {
   const supabase = await createClient();
 
@@ -126,6 +158,19 @@ export async function deleteStudent(studentId: string): Promise<void> {
     .from("students")
     .delete()
     .eq("id", studentId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function bulkDeleteStudents(studentIds: string[]): Promise<void> {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("students")
+    .delete()
+    .in("id", studentIds);
 
   if (error) {
     throw new Error(error.message);

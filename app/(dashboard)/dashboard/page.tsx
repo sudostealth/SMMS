@@ -1,16 +1,21 @@
 import { getCurrentUser, getMentorProfile } from "@/lib/services/auth-service";
 import { getBatchesByMentor } from "@/lib/services/batch-service";
+import { getTotalStudentsForMentor } from "@/lib/services/student-service";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, BookOpen, CheckCircle, Award } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { BlurFade } from "@/components/magicui/blur-fade";
+import { TextReveal } from "@/components/magicui/text-reveal";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
   const mentor = await getMentorProfile(user!.id);
-  const batches = await getBatchesByMentor(mentor.id);
+  const [batches, totalStudents] = await Promise.all([
+    getBatchesByMentor(mentor.id),
+    getTotalStudentsForMentor(mentor.id)
+  ]);
 
-  const totalStudents = 0; // This would need a separate query
   const activeBatches = batches.filter((b) => b.status === "Active").length;
   const graduatedBatches = batches.filter((b) => b.status === "Graduated").length;
 
@@ -18,10 +23,24 @@ export default async function DashboardPage() {
     <div className="p-6 lg:p-8 space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Welcome back, {mentor.full_name}!</h1>
-        <p className="text-muted-foreground mt-2">
-          Here's an overview of your mentorship activities
-        </p>
+        <BlurFade delay={0.1} inView>
+          <h1 className="text-3xl font-bold flex flex-wrap items-center gap-2">
+            Welcome back,{" "}
+            <TextReveal
+              text={mentor.full_name}
+              as="span"
+              fontSize="inherit"
+              className="px-0 py-0 normal-case tracking-normal"
+              style={{ padding: 0 }}
+            />
+            !
+          </h1>
+        </BlurFade>
+        <BlurFade delay={0.2} inView>
+          <p className="text-muted-foreground mt-2">
+            Here's an overview of your mentorship activities
+          </p>
+        </BlurFade>
       </div>
 
       {/* Stats Grid */}

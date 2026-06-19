@@ -97,3 +97,16 @@ export async function deleteSession(sessionId: string): Promise<void> {
     throw new Error(error.message);
   }
 }
+
+export async function bulkDeleteSessions(sessionIds: string[]): Promise<void> {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("sessions")
+    .delete()
+    .in("id", sessionIds);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}

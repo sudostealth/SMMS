@@ -8,7 +8,8 @@ import { Search, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { deleteStudentAction } from "@/app/(dashboard)/actions";
+import { deleteStudentAction, bulkDeleteStudentsAction } from "@/app/(dashboard)/actions";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,6 +48,48 @@ export default function StudentSearch({ batchId, students, sessions, attendanceB
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [selectedStudents, setSelectedStudents] = useState<Set<string>>(new Set());
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedStudents(new Set(filteredStudents.map(s => s.id)));
+    } else {
+      setSelectedStudents(new Set());
+    }
+  };
+
+  const handleSelectStudent = (studentId: string, checked: boolean) => {
+    const newSelected = new Set(selectedStudents);
+    if (checked) {
+      newSelected.add(studentId);
+    } else {
+      newSelected.delete(studentId);
+    }
+    setSelectedStudents(newSelected);
+  };
+
+  const handleBulkDelete = async () => {
+    setIsBulkDeleting(true);
+    try {
+      const result = await bulkDeleteStudentsAction(batchId, Array.from(selectedStudents));
+      if (!result.success) throw new Error(result.error);
+
+      toast({
+        title: "Success",
+        description: `Successfully deleted ${selectedStudents.size} students`,
+      });
+      setSelectedStudents(new Set());
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to delete students",
+        variant: "destructive",
+      });
+    } finally {
+      setIsBulkDeleting(false);
+    }
+  };
 
   const handleDelete = async (studentId: string) => {
     setIsDeleting(studentId);
@@ -111,22 +154,69 @@ export default function StudentSearch({ batchId, students, sessions, attendanceB
   return (
     <div className="space-y-4">
       {/* Search Bar */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search by name, student ID, phone, or email..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
-        />
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by name, student ID, phone, or email..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
+        {/* Bulk Actions */}
+        {selectedStudents.size > 0 && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={isBulkDeleting}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Selected ({selectedStudents.size})
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete {selectedStudents.size} selected students and remove all their attendance records from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleBulkDelete}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </div>
 
-      {/* Results Count */}
-      {searchQuery && (
-        <p className="text-sm text-muted-foreground">
-          Found {filteredStudents.length} student{filteredStudents.length !== 1 ? 's' : ''}
-        </p>
-      )}
+      {/* Results Count & Select All */}
+      <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <div>
+          {searchQuery ? (
+            <span>Found {filteredStudents.length} student{filteredStudents.length !== 1 ? 's' : ''}</span>
+          ) : (
+            <span>Total {students.length} student{students.length !== 1 ? 's' : ''}</span>
+          )}
+        </div>
+        {filteredStudents.length > 0 && (
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="select-all"
+              checked={selectedStudents.size === filteredStudents.length && filteredStudents.length > 0}
+              onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
+            />
+            <label htmlFor="select-all" className="cursor-pointer font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Select All
+            </label>
+          </div>
+        )}
+      </div>
 
       {/* Student List with Stats */}
       <div className="space-y-3">
@@ -144,13 +234,20 @@ export default function StudentSearch({ batchId, students, sessions, attendanceB
               <Card key={student.id} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-base">{student.name}</CardTitle>
-                      <CardDescription className="mt-1">
+                    <div className="flex items-start gap-4 flex-1">
+                      <Checkbox
+                        className="mt-1"
+                        checked={selectedStudents.has(student.id)}
+                        onCheckedChange={(checked) => handleSelectStudent(student.id, checked as boolean)}
+                      />
+                      <div>
+                        <CardTitle className="text-base">{student.name}</CardTitle>
+                        <CardDescription className="mt-1">
                         ID: {student.student_id}
-                        {student.phone && ` • ${student.phone}`}
-                        {student.email && ` • ${student.email}`}
-                      </CardDescription>
+                          {student.phone && ` • ${student.phone}`}
+                          {student.email && ` • ${student.email}`}
+                        </CardDescription>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge

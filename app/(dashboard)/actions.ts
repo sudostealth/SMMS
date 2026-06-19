@@ -30,6 +30,36 @@ export async function createBatchAction(data: CreateBatchInput) {
   }
 }
 
+export async function bulkDeleteSessionsAction(batchId: string, sessionIds: string[]) {
+  "use server";
+  try {
+    const { bulkDeleteSessions } = await import("@/lib/services/session-service");
+    await bulkDeleteSessions(sessionIds);
+    revalidatePath(`/batches/${batchId}`);
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to delete sessions",
+    };
+  }
+}
+
+export async function bulkDeleteStudentsAction(batchId: string, studentIds: string[]) {
+  "use server";
+  try {
+    const { bulkDeleteStudents } = await import("@/lib/services/student-service");
+    await bulkDeleteStudents(studentIds);
+    revalidatePath(`/batches/${batchId}`);
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to delete students",
+    };
+  }
+}
+
 export async function updateBatchAction(batchId: string, data: UpdateBatchInput) {
   try {
     const user = await getCurrentUser();
