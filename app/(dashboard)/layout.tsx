@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser, getMentorProfile } from "@/lib/services/auth-service";
 import DashboardSidebar from "@/components/layout/dashboard-sidebar";
 import Footer from "@/components/layout/footer";
+import { HowToUse } from "@/components/how-to-use";
 
 export default async function DashboardLayout({
   children,
@@ -27,6 +28,7 @@ export default async function DashboardLayout({
           <Footer />
         </main>
       </div>
+      <HowToUse />
     </div>
   );
 }
