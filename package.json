@@ -25,6 +25,7 @@
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.47.10",
     "@types/three": "^0.184.1",
+    "canvg": "^4.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
